@@ -13,10 +13,10 @@
 #define FLAG_DIRECTORIES  1
 #define FLAG_FILES        2
 
-#define PRINT_DIR printf("\033[1;32m");   // green
+#define PRINT_DIR printf("\033[1;32m");   // Green
 #define PRINT_FILE printf("\033[0;37m");  // Blue
 #define PRINT_LINK printf("\033[0;36m");  // Cyan
-#define PRINT_OFF printf("\033[0m");
+#define PRINT_OFF printf("\033[0m");      // Reset
 
 void directory_browsing( char *introducedDir,  bool* flags, char fl ) // NOLINT(misc-no-recursion)
 {
@@ -42,19 +42,19 @@ void directory_browsing( char *introducedDir,  bool* flags, char fl ) // NOLINT(
         if(lstat(pathName, &entryInfo) == 0) {
             if(S_ISDIR(entryInfo.st_mode)) {
 			    if(flags[FLAG_DIRECTORIES] || fl == 1) {
-                    PRINT_DIR printf("\t-d %s\n", pathName); PRINT_OFF
+                    PRINT_DIR printf("%s\n", pathName); PRINT_OFF
 			    }
                 directory_browsing(pathName, flags, fl);
             } else if(S_ISREG(entryInfo.st_mode) && (flags[FLAG_FILES] || fl == 1)) {
-            		PRINT_FILE printf("\t-f %s has %lld bytes\n", pathName, (long long)entryInfo.st_size); PRINT_OFF
+            		PRINT_FILE printf("%s has %lld bytes\n", pathName, (long long)entryInfo.st_size); PRINT_OFF
             } else if(S_ISLNK(entryInfo.st_mode)) {
                 char targetName[PATH_MAX + 1];
                 if(readlink(pathName, targetName, PATH_MAX) != -1) {
 				    if(flags[FLAG_SYMLINK] || fl == 1)
-            			PRINT_LINK printf("\t-l %s -> %s\n", pathName, targetName); PRINT_OFF
+            			PRINT_LINK printf("%s -> %s\n", pathName, targetName); PRINT_OFF
                 } else {
 				if(flags[FLAG_SYMLINK] || fl == 1)
-            				printf("\t%s -> (invalid symbolic link!)\n", pathName);
+            				printf("%s -> (invalid symbolic link!)\n", pathName);
                 }
             }
         } else {
@@ -65,13 +65,23 @@ void directory_browsing( char *introducedDir,  bool* flags, char fl ) // NOLINT(
 	closedir(dir);
 }
 
-bool* parse_options (int argc, char* args) {
+bool* parse_options (int argc, char** args) {
     bool* arg_flags = (bool*) calloc(3, sizeof (bool));
     if (argc < 2)
         return arg_flags;
-    arg_flags[FLAG_FILES] = strstr(args, "f") != NULL ? true : false;
-    arg_flags[FLAG_DIRECTORIES] = strstr(args, "d") != NULL ? true : false;
-    arg_flags[FLAG_SYMLINK] = strstr(args, "l") != NULL ? true : false;
+    int flag_search_result;
+    while ( (flag_search_result = getopt(argc, args, "dfls?")) != -1){
+        switch (flag_search_result) {
+            case 'd': arg_flags[FLAG_DIRECTORIES] = 1; break;
+            case 'f': arg_flags[FLAG_FILES] = 1; break;
+            case 'l': arg_flags[FLAG_SYMLINK] = 1; break;
+            case '?':
+                printf("Usage: -d -- directories, -f -- files, -l -- links\n");
+                free(arg_flags);
+                exit(EXIT_SUCCESS);
+            default: continue;
+        }
+    }
     return arg_flags;
 }
 
@@ -91,14 +101,12 @@ int main(int argc, char **argv)
             if(flags[FLAG_FILES] || flags[FLAG_DIRECTORIES]|| flags[FLAG_SYMLINK]) {
                 strncpy(option, argv[1], PATH_MAX);
                 strcpy(direct,".");
-                flag = 0;
             }
             break;
         }
         case 3: { // flags and dir
             strncpy(option, argv[2], PATH_MAX);
             strcpy(direct, argv[1]);
-            flag = 0;
             break;
         }
         default:
