@@ -18,7 +18,7 @@
 #define PRINT_LINK printf("\033[0;36m");  // Cyan
 #define PRINT_OFF printf("\033[0m");      // Reset
 
-void directory_browsing( char *introducedDir,  bool* flags, char fl ) // NOLINT(misc-no-recursion)
+void directory_browsing( char *introducedDir,  bool* flags ) // NOLINT(misc-no-recursion)
 {
     DIR *dir = NULL;
     struct dirent *entry = NULL;
@@ -41,19 +41,20 @@ void directory_browsing( char *introducedDir,  bool* flags, char fl ) // NOLINT(
         struct stat entryInfo;
         if(lstat(pathName, &entryInfo) == 0) {
             if(S_ISDIR(entryInfo.st_mode)) {
-			    if(flags[FLAG_DIRECTORIES] || fl == 1) {
+			    if(flags[FLAG_DIRECTORIES]) {
                     PRINT_DIR printf("%s\n", pathName); PRINT_OFF
 			    }
-                directory_browsing(pathName, flags, fl);
-            } else if(S_ISREG(entryInfo.st_mode) && (flags[FLAG_FILES] || fl == 1)) {
-            		PRINT_FILE printf("%s has %lld bytes\n", pathName, (long long)entryInfo.st_size); PRINT_OFF
+                directory_browsing(pathName, flags);
+            } else if(S_ISREG(entryInfo.st_mode) && (flags[FLAG_FILES])) {
+//            		PRINT_FILE printf("%s has %lld bytes\n", pathName, (long long)entryInfo.st_size); PRINT_OFF
+            		PRINT_FILE printf("%s \n", pathName); PRINT_OFF
             } else if(S_ISLNK(entryInfo.st_mode)) {
                 char targetName[PATH_MAX + 1];
                 if(readlink(pathName, targetName, PATH_MAX) != -1) {
-				    if(flags[FLAG_SYMLINK] || fl == 1)
+				    if(flags[FLAG_SYMLINK])
             			PRINT_LINK printf("%s -> %s\n", pathName, targetName); PRINT_OFF
                 } else {
-				if(flags[FLAG_SYMLINK] || fl == 1)
+				if(flags[FLAG_SYMLINK])
             				printf("%s -> (invalid symbolic link!)\n", pathName);
                 }
             }
@@ -89,12 +90,13 @@ int main(int argc, char **argv)
 {
 	char option[PATH_MAX];
 	char direct[PATH_MAX];
-	char flag = 0;
     bool* flags = parse_options(argc, argv);
     switch (argc) {
         case 1: { // no args
             strcpy(direct,".");
-            flag = 1;
+            flags[FLAG_SYMLINK] = 1;
+            flags[FLAG_FILES] = 1;
+            flags[FLAG_DIRECTORIES] = 1;
             break;
         }
         case 2: { // only flags
@@ -105,14 +107,13 @@ int main(int argc, char **argv)
             break;
         }
         case 3: { // flags and dir
-            strncpy(option, argv[2], PATH_MAX);
-            strcpy(direct, argv[1]);
+            strncpy(direct, argv[2], PATH_MAX);
             break;
         }
         default:
             return 1;
     }
-    directory_browsing(direct, flags, flag );
+    directory_browsing(direct, flags );
     free(flags);
     return 0;
 }
