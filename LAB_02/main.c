@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include "func.h"
+#include "keyboard_input.h"
 
 extern char** environ;
 extern const char child_path[];
@@ -26,6 +27,7 @@ int main(int argc, char* argv[], char* envp[]) {
 
     size_t child_count = 0;
     int opt;
+    fix_keyboard();
     while ((opt = getchar()) != EOF) {
         if (opt == 'q') {
             exit(EXIT_SUCCESS);
@@ -72,4 +74,5 @@ int main(int argc, char* argv[], char* envp[]) {
             exit(errno);
         }
     }
+    restore_keyboard();
 }
