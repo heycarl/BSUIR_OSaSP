@@ -64,6 +64,7 @@ int main(int argc, char* argv[], char* envp[]) {
             wait(&status);
         } else if (pid == 0) {
             // Child process
+            CLEAR_SCREEN
             if (execve(child_process, args, envp) == -1) {
                 perror("execve");
                 exit(errno);
