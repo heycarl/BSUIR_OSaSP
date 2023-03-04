@@ -69,6 +69,9 @@ void directory_browsing( char *introducedDir,  bool* flags ) // NOLINT(misc-no-r
 bool* parse_options (int argc, char** args) {
     bool* arg_flags = (bool*) calloc(3, sizeof (bool));
     if (argc < 2)
+        arg_flags[FLAG_DIRECTORIES] = 1;
+        arg_flags[FLAG_FILES] = 1;
+        arg_flags[FLAG_SYMLINK] = 1;
         return arg_flags;
     int flag_search_result;
     while ( (flag_search_result = getopt(argc, args, "dfls?")) != -1){
