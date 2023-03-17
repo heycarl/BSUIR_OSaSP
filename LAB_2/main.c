@@ -11,7 +11,7 @@
 #include <unistd.h>
 
 #include "func.h"
-#include "keyboard_input.h"
+#include "../keyboard_input.h"
 
 extern char** environ;
 extern const char child_path[];
@@ -23,7 +23,6 @@ int main(int argc, char* argv[], char* envp[]) {
     }
 
     print_env(envp);
-//    char* const* env = make_child_env(argv[1]); // argv[1] in file path
 
     size_t child_count = 0;
     int opt;

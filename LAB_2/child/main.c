@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include "color_print.h"
+#include "../../color_print.h"
 
 const int MAX_SIZE = 256;
 
