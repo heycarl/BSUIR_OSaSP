@@ -1,6 +1,3 @@
-//
-// Created by sasha on 2/16/23.
-//
 
 #include "func.h"
 #include <stdio.h>

@@ -1,6 +1,9 @@
 #include<stdio.h>
 #include <termios.h>            //termios, TCSANOW, ECHO, ICANON
-#include <unistd.h>     //STDIN_FILENO
+#include <unistd.h>             //STDIN_FILENO
+
+#define CLEAR_SCREEN system("clear");
+
 
 static struct termios old_config, new_config;
 
