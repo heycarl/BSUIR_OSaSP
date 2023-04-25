@@ -41,6 +41,9 @@ add_executable(LAB_5
         LAB_5/src/consumer.h
         LAB_5/src/consumer.c)
 
+add_executable(LAB_6_Generator
+        LAB_6/src/generator/main.c)
+
 target_include_directories(LAB_2 PRIVATE
         .)
 
@@ -60,4 +63,7 @@ target_include_directories(LAB_4 PRIVATE
         .)
 
 target_include_directories(LAB_5 PRIVATE
+        .)
+
+target_include_directories(LAB_6_Generator PRIVATE
         .)
