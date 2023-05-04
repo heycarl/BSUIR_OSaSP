@@ -7,7 +7,7 @@
 
 static struct termios old_config, new_config;
 
-void fix_keyboard() {
+void fix_keyboard(void) {
 
     tcgetattr( STDIN_FILENO, &old_config);
     new_config = old_config;
@@ -15,6 +15,6 @@ void fix_keyboard() {
     tcsetattr( STDIN_FILENO, TCSANOW, &new_config);
 }
 
-void restore_keyboard() {
+void restore_keyboard(void) {
     tcsetattr( STDIN_FILENO, TCSANOW, &old_config);
 }

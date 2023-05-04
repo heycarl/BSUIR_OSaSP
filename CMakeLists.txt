@@ -44,6 +44,18 @@ add_executable(LAB_5
 add_executable(LAB_6_Generator
         LAB_6/src/generator/main.c)
 
+add_executable(LAB_6_Sort
+        LAB_6/src/sort_index/main.c
+        )
+
+add_executable(LAB_8_Server
+        LAB_8/src/server/main.c
+        )
+
+add_executable(LAB_8_Client
+        LAB_8/src/client/main.c
+        )
+
 target_include_directories(LAB_2 PRIVATE
         .)
 
@@ -66,4 +78,13 @@ target_include_directories(LAB_5 PRIVATE
         .)
 
 target_include_directories(LAB_6_Generator PRIVATE
+        .)
+
+target_include_directories(LAB_6_Sort PRIVATE
+        .)
+
+target_include_directories(LAB_8_Server PRIVATE
+        .)
+
+target_include_directories(LAB_8_Client PRIVATE
         .)
