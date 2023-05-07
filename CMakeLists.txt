@@ -50,7 +50,10 @@ add_executable(LAB_6_Sort
 
 add_executable(LAB_8_Server
         LAB_8/src/server/main.c
-        )
+        LAB_8/src/server/cmd/cmd.h
+        LAB_8/src/server/cmd/ack.h
+        LAB_8/src/server/cmd/parser.h
+        LAB_8/src/server/cmd/invoker.h LAB_8/src/server/cmd/echo.h)
 
 add_executable(LAB_8_Client
         LAB_8/src/client/main.c
@@ -87,4 +90,6 @@ target_include_directories(LAB_8_Server PRIVATE
         .)
 
 target_include_directories(LAB_8_Client PRIVATE
-        .)
+        .
+        LAB_8/src/server/cmd
+        )

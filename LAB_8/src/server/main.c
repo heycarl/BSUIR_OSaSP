@@ -9,6 +9,9 @@
 
 #include "color_print.h"
 
+#include "cmd/parser.h"
+#include "cmd/invoker.h"
+
 #define MAX_CLIENTS 10
 #define BUFFER_SIZE 1024
 
@@ -26,48 +29,10 @@ void *handle_server_msg(void *arg) {
 
     while ((read_size = recv(client_socket, buffer, BUFFER_SIZE, 0)) > 0) {
         printf("New MSG: %s", buffer);
-        if (strcmp(buffer, "Q\n") == 0) {
-            send(client_socket, "Bye!\n", sizeof("Bye!\n"), 0);
-            break;
-        } else if (strcmp(buffer, "ACK\n") == 0) {
-            send(client_socket, "ACK received\n", sizeof("ACK received\n"), 0);
-        } else if (strcmp(buffer, "ECHO\n") == 0) {
-            send(client_socket, "ECHO mode enabled\n", sizeof("ECHO mode enabled\n"), 0);
-            while ((read_size = recv(client_socket, buffer, BUFFER_SIZE, 0)) > 0) {
-                printf("New MSG: %s\n", buffer);
-                if (strcmp(buffer, "QUIT\n") == 0) {
-                    break;
-                }
-                send(client_socket, buffer, read_size, 0);
-                memset(buffer, 0, BUFFER_SIZE);
-            }
-            send(client_socket, "ECHO mode disabled\n", 19, 0);
-        } else {
-            pthread_mutex_lock(&mutex);
-            for (int i = 0; i < num_clients; i++) {
-                if (client_sockets[i] != client_socket) {
-                    send(client_sockets[i], buffer, read_size, 0);
-                } else {
-                    send(client_sockets[i], "Broadcast MSG sent\n", sizeof("Broadcast MSG sent\n"), 0);
-                }
-            }
-            pthread_mutex_unlock(&mutex);
-        }
+        buffer[read_size - 1] = '\0';
+        invoke(parse_request(buffer), client_socket, buffer);
         memset(buffer, 0, BUFFER_SIZE);
     }
-
-//    pthread_mutex_lock(&mutex);
-//    for (int i = 0; i < num_clients; i++) {
-//        if (client_sockets[i] == client_socket) {
-//            while (i < num_clients - 1) {
-//                client_sockets[i] = client_sockets[i + 1];
-//                i++;
-//            }
-//            num_clients--;
-//            break;
-//        }
-//    }
-//    pthread_mutex_unlock(&mutex);
 
     close(client_socket);
     return NULL;
