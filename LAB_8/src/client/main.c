@@ -21,7 +21,7 @@ void *handle_server_msg(void *arg) {
         }
 
         buffer[bytes_received] = 0; // add null terminator
-        printf(YELLOW("Server response: ") "%s", buffer);
+        printf(YELLOW("Server response: ") "%s\n", buffer);
         if (strcmp(buffer, "Bye!\n") == 0)
             break;
     }
