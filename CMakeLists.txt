@@ -53,7 +53,7 @@ add_executable(LAB_8_Server
         LAB_8/src/server/cmd/cmd.h
         LAB_8/src/server/cmd/ack.h
         LAB_8/src/server/cmd/parser.h
-        LAB_8/src/server/cmd/invoker.h LAB_8/src/server/cmd/echo.h)
+        LAB_8/src/server/cmd/invoker.h LAB_8/src/server/cmd/echo.h LAB_8/src/server/cmd/fs.h LAB_8/src/server/cmd/info.h)
 
 add_executable(LAB_8_Client
         LAB_8/src/client/main.c

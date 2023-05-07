@@ -7,6 +7,7 @@
 
 #include "echo.h"
 #include "ack.h"
+#include "info.h"
 
 #define NUM_OF_CMDs 6
 
@@ -28,6 +29,7 @@ typedef struct{
 cmd_t cmds[NUM_OF_CMDs] = {
         {ECHO, "ECHO",cmd_echo},
         {ACK, "ACK",cmd_ack},
+        {INFO, "INFO", cmd_info}
 };
 
 #endif //OSASP_LABS_CMD_H
