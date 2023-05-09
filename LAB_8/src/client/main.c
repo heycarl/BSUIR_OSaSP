@@ -8,13 +8,13 @@
 
 #include "color_print.h"
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 2048
 
 void *handle_server_msg(void *arg) {
     char buffer[BUFFER_SIZE];
-    int* client_socket = arg;
+    int *client_socket = arg;
     while (1) {
-        ssize_t bytes_received = recv(*client_socket, buffer, BUFFER_SIZE-1, 0);
+        ssize_t bytes_received = recv(*client_socket, buffer, BUFFER_SIZE, 0);
         if (bytes_received == -1) {
             perror("Failed to receive response");
             break;
@@ -22,7 +22,8 @@ void *handle_server_msg(void *arg) {
 
         buffer[bytes_received] = 0; // add null terminator
         printf(YELLOW("Server response: ") "%s\n", buffer);
-        if (strcmp(buffer, "Bye!\n") == 0)
+
+        if (strcmp(buffer, "Bye!") == 0)
             break;
     }
     return NULL;
@@ -63,7 +64,10 @@ int main(int argc, char *argv[]) {
         if (strlen(buffer) == 0) {
             continue; // ignore empty commands
         }
+        buffer[strlen(buffer)-1] = '\0';
         ssize_t bytes_sent = send(client_socket, buffer, strlen(buffer), 0);
+        if (strcmp(buffer, "QUIT") == 0)
+            break;
         if (bytes_sent == -1) {
             perror("Failed to send command");
             break;
