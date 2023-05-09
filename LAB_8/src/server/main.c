@@ -11,9 +11,10 @@
 
 #include "cmd/parser.h"
 #include "cmd/invoker.h"
+#include "cmd/command.h"
 
 #define MAX_CLIENTS 10
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 2048
 
 int client_sockets[MAX_CLIENTS];
 int num_clients = 0;
@@ -27,10 +28,19 @@ void *handle_server_msg(void *arg) {
     char buffer[BUFFER_SIZE];
     size_t read_size;
 
+    args_t args = {
+            client_socket,
+            buffer,
+            0,
+            "."
+    };
+
     while ((read_size = recv(client_socket, buffer, BUFFER_SIZE, 0)) > 0) {
         printf("New MSG: %s", buffer);
         buffer[read_size - 1] = '\0';
-        invoke(parse_request(buffer), client_socket, buffer);
+        args.buffer = buffer;
+        args.read_bytes = read_size;
+        invoke(parse_request(buffer), &args);
         memset(buffer, 0, BUFFER_SIZE);
     }
 

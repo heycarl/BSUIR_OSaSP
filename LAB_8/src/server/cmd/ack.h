@@ -7,8 +7,10 @@
 
 #include <sys/socket.h>
 
-void cmd_ack(int socket, char* buffer) {
-    send(socket, "ACK received", sizeof("ACK received"), 0);
+#include "command.h"
+
+void cmd_ack(args_t*args) {
+    send(args->socket, "ACK received\n", sizeof("ACK received\n"), 0);
 }
 
 #endif //OSASP_LABS_ACK_H

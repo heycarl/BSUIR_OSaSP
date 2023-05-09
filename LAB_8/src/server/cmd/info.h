@@ -7,8 +7,12 @@
 
 #include <sys/socket.h>
 
-void cmd_info(int socket, char* buffer) {
-    send(socket, "Hello from LAB server!", sizeof("Hello from LAB server!"), 0);
+#include "command.h"
+
+void cmd_info(args_t* args) {
+    char response[BUFFER_SIZE];
+    strcpy(response, "Hello from LAB server!\n");
+    send(args->socket, response, strlen(response), 0);
 }
 
 #endif //OSASP_LABS_INFO_H

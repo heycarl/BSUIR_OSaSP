@@ -9,7 +9,7 @@
 #include "cmd.h"
 
 enum CMD parse_request(char* buffer) {
-    for (int i = 0; i < NUM_OF_CMDs - 1; ++i) {
+    for (int i = 0; i < NUM_OF_CMDs; ++i) {
         if (strstr(buffer, cmds[i].cmd_name) != NULL)
             return cmds[i].cmd;
     }

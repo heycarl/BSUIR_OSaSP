@@ -8,9 +8,11 @@
 #include <sys/socket.h>
 #include <string.h>
 
-void cmd_echo(int socket, char* buffer) {
-    char* r = buffer + strlen("ECHO ") * sizeof(char);
-    send(socket, r, strlen(r) * sizeof(char), 0);
+#include "command.h"
+
+void cmd_echo(args_t* args) {
+    char* r = args->buffer + strlen("ECHO ") * sizeof(char);
+    send(args->socket, r, strlen(r) * sizeof(char), 0);
 }
 
 #endif //OSASP_LABS_ECHO_H
