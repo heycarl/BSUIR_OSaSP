@@ -16,12 +16,12 @@
 #define NUM_OF_CMDs 6
 
 enum CMD {
-    ECHO,
-    QUIT,
-    INFO,
-    CD,
-    LIST,
-    ACK
+    CMD_ECHO,
+    CMD_QUIT,
+    CMD_INFO,
+    CMD_CD,
+    CMD_LIST,
+    CMD_ACK
 };
 
 typedef struct{
@@ -31,12 +31,12 @@ typedef struct{
 } cmd_t;
 
 cmd_t cmds[NUM_OF_CMDs] = {
-        {ECHO, "ECHO",cmd_echo},
-        {QUIT, "QUIT", cmd_quit},
-        {ACK, "ACK",cmd_ack},
-        {INFO, "INFO", cmd_info},
-        {CD, "CD", cmd_cd},
-        {LIST, "LIST", cmd_list}
+        {CMD_ECHO, "ECHO", cmd_echo},
+        {CMD_QUIT, "QUIT", cmd_quit},
+        {CMD_ACK,  "ACK",      cmd_ack},
+        {CMD_INFO, "INFO", cmd_info},
+        {CMD_CD,   "CD",   cmd_cd},
+        {CMD_LIST, "LIST", cmd_list}
 };
 
 #endif //OSASP_LABS_CMD_H

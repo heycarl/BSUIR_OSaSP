@@ -1,13 +1,14 @@
 //
 // Created by sasha on 5/8/23.
 //
-#define BUFFER_SIZE 2048
 
 #ifndef OSASP_LABS_COMMAND_H
 #define OSASP_LABS_COMMAND_H
 
 #include <stdint.h>
 #include <limits.h>
+
+#include "protocol.h"
 
 typedef struct {
     int socket;

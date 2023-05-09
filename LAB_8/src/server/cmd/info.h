@@ -10,9 +10,14 @@
 #include "command.h"
 
 void cmd_info(args_t* args) {
-    char response[BUFFER_SIZE];
-    strcpy(response, "Hello from LAB server!\n");
-    send(args->socket, response, strlen(response), 0);
+    packet_t response;
+    response.type = PACKET_INFO;
+    char payload[BUFFER_SIZE];
+    char hostname[HOST_NAME_MAX];
+    gethostname(hostname, HOST_NAME_MAX);
+    sprintf(payload, "Hello from %s server!", hostname);
+    set_payload_string(&response, payload);
+    send(args->socket, serialize_packet(&response), PACKET_BUFFER_SIZE, 0);
 }
 
 #endif //OSASP_LABS_INFO_H

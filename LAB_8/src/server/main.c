@@ -37,7 +37,6 @@ void *handle_server_msg(void *arg) {
 
     while ((read_size = recv(client_socket, buffer, BUFFER_SIZE, 0)) > 0) {
         printf("New MSG: %s", buffer);
-        buffer[read_size - 1] = '\0';
         args.buffer = buffer;
         args.read_bytes = read_size;
         invoke(parse_request(buffer), &args);

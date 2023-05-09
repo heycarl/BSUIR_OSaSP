@@ -10,7 +10,10 @@
 #include "command.h"
 
 void cmd_ack(args_t*args) {
-    send(args->socket, "ACK received\n", sizeof("ACK received\n"), 0);
+    packet_t response;
+    response.type = PACKET_ACK;
+    set_payload_string(&response, "Recieved");
+    send(args->socket, serialize_packet(&response), PACKET_BUFFER_SIZE, 0);
 }
 
 #endif //OSASP_LABS_ACK_H
