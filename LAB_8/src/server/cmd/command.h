@@ -17,6 +17,4 @@ typedef struct {
     char current_path[PATH_MAX];
 } args_t;
 
-#define BUFFER_SIZE 2048
-
 #endif //OSASP_LABS_COMMAND_H

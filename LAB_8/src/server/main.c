@@ -14,7 +14,6 @@
 #include "cmd/command.h"
 
 #define MAX_CLIENTS 10
-#define BUFFER_SIZE 2048
 
 int client_sockets[MAX_CLIENTS];
 int num_clients = 0;

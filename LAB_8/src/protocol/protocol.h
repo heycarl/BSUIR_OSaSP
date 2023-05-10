@@ -5,7 +5,7 @@
 #ifndef OSASP_LABS_PROTOCOL_H
 #define OSASP_LABS_PROTOCOL_H
 
-#define BUFFER_SIZE 2048
+#define BUFFER_SIZE 4096
 #define PACKET_BUFFER_SIZE (BUFFER_SIZE + 6)
 
 #include <stdint.h>

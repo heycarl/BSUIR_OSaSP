@@ -5,10 +5,36 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include "protocol.h"
 
 #include "color_print.h"
+
+pthread_barrier_t response_wait_barrier;
+
+//#define MAX_SCRIPT_CMD 25
+//#define MAX_CMD_LENGTH 50
+//
+//char current_dir[PATH_MAX];
+//
+//
+//typedef struct {
+//  uint8_t cmd_num;
+//  char cmd[MAX_SCRIPT_CMD][BUFFER_SIZE];
+//} cmd_list;
+//
+//void parse_script_file(cmd_list* list, char* filename) {
+//    char script_path[PATH_MAX];
+//    strcat(script_path, "./");
+//    strcat(script_path, filename + sizeof(char));
+//    FILE* script_file = fopen(script_path, "rt");
+//    uint8_t cmd_index = 0;
+//    while (fgets(list->cmd[list->cmd_num], MAX_CMD_LENGTH, script_file)) {
+//        list->cmd[list->cmd_num][strlen(list->cmd[list->cmd_num])-1] = '\0';
+//        list->cmd_num++;
+//    }
+//}
 
 void *handle_server_msg(void *arg) {
     char buffer[PACKET_BUFFER_SIZE];
@@ -21,8 +47,22 @@ void *handle_server_msg(void *arg) {
         }
 
         packet_t* packet = deserialize_packet(buffer);
-
-        printf(YELLOW("Server response ") CYAN("[%s]") YELLOW(": ") "%s\n", packet_type_ui(packet->type), packet->payload.data);
+        switch (packet->type) {
+            case PACKET_INFO:
+                printf(YELLOW("Server response : ") "%s\n", packet->payload.data);
+                printf(YELLOW("%s> "), current_dir);
+                break;
+            case PACKET_DIRECTORTY:
+                strcpy(current_dir, packet->payload.data);
+                printf(YELLOW("%s> "), current_dir);
+                break;
+            case PACKET_ACK:
+                printf(CYAN("ACK response : ") "%s\n", packet->payload.data);
+                break;
+            default:
+                continue;
+        }
+        pthread_barrier_wait(&response_wait_barrier);
 
         if (strcmp(buffer, "Bye!") == 0)
             break;
@@ -41,6 +81,8 @@ int main(int argc, char *argv[]) {
         perror("Failed to create socket");
         return 1;
     }
+
+    pthread_barrier_init(&response_wait_barrier, NULL, 2);
 
     struct sockaddr_in server_address = {0};
     server_address.sin_family = AF_INET;
@@ -66,8 +108,17 @@ int main(int argc, char *argv[]) {
             continue; // ignore empty commands
         }
         buffer[strlen(buffer)-1] = '\0';
+//        if (strstr(buffer, "@") != NULL) { // script file
+//            cmd_list script_cmds;
+//            parse_script_file(&script_cmds, buffer);
+//            for (int i = 0; i < script_cmds.cmd_num; ++i) {
+//                send(client_socket, script_cmds.cmd[i], strlen(script_cmds.cmd[i]), 0);
+//            }
+//            continue;
+//        }
         ssize_t bytes_sent = send(client_socket, buffer, strlen(buffer), 0);
-        if (strcmp(buffer, "CMD_QUIT") == 0)
+        pthread_barrier_wait(&response_wait_barrier);
+        if (strcmp(buffer, "QUIT") == 0)
             break;
         if (bytes_sent == -1) {
             perror("Failed to send command");
