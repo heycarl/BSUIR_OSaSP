@@ -13,7 +13,9 @@
 enum PACKET_TYPE{
     PACKET_INFO,
     PACKET_DIRECTORTY,
-    PACKET_ACK
+    PACKET_ACK,
+    PACKET_DISCOVERY_REQ,
+    PACKET_DISCOVERY_RESP,
 };
 
 typedef struct {
@@ -74,6 +76,10 @@ char* packet_type_ui(enum PACKET_TYPE type) {
             return "ACK";
         case PACKET_DIRECTORTY:
             return "DIR";
+        case PACKET_DISCOVERY_REQ:
+            return "DISCOVERY REQUEST";
+        case PACKET_DISCOVERY_RESP:
+            return "DISCOVERY RESPONSE";
         default:
             return "UNKNOWN";
     }

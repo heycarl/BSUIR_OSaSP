@@ -10,6 +10,9 @@
 #include "command.h"
 
 void cmd_quit(args_t* args) {
-    send(args->socket, "Bye!", sizeof("Bye!"), 0);
+    packet_t response;
+    response.type = PACKET_INFO;
+    set_payload_string(&response, "BYE");
+    send(args->socket, serialize_packet(&response), PACKET_BUFFER_SIZE, 0);
 }
 #endif //OSASP_LABS_QUIT_H

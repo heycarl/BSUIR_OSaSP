@@ -8,6 +8,7 @@
 #include <limits.h>
 
 #include "protocol.h"
+#include "discovery_client.h"
 
 #include "color_print.h"
 
@@ -16,7 +17,7 @@ pthread_barrier_t response_wait_barrier;
 //#define MAX_SCRIPT_CMD 25
 //#define MAX_CMD_LENGTH 50
 //
-//char current_dir[PATH_MAX];
+char current_dir[PATH_MAX];
 //
 //
 //typedef struct {
@@ -50,29 +51,28 @@ void *handle_server_msg(void *arg) {
         switch (packet->type) {
             case PACKET_INFO:
                 printf(YELLOW("Server response : ") "%s\n", packet->payload.data);
-                printf(YELLOW("%s> "), current_dir);
+                if (strcmp(packet->payload.data, "BYE") == 0)
+                    exit(EXIT_SUCCESS);
                 break;
             case PACKET_DIRECTORTY:
                 strcpy(current_dir, packet->payload.data);
-                printf(YELLOW("%s> "), current_dir);
                 break;
             case PACKET_ACK:
                 printf(CYAN("ACK response : ") "%s\n", packet->payload.data);
                 break;
             default:
+                printf(YELLOW("%s> "), current_dir);
                 continue;
         }
+        printf(YELLOW("%s> "), current_dir);
         pthread_barrier_wait(&response_wait_barrier);
-
-        if (strcmp(buffer, "Bye!") == 0)
-            break;
     }
     return NULL;
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 3) {
-        printf("Usage: %s <ip-address>\n", argv[0]);
+    if (argc != 2) {
+        printf("Usage: %s <port>\n", argv[0]);
         return 1;
     }
 
@@ -81,14 +81,20 @@ int main(int argc, char *argv[]) {
         perror("Failed to create socket");
         return 1;
     }
+    pthread_barrier_init(&server_discovery_barrier, NULL, 2);
+    pthread_t discovery_thread;
+    char server_address_char[16];
+    pthread_create(&discovery_thread, NULL, multicast_thread_handler, server_address_char);
+
+    pthread_barrier_wait(&server_discovery_barrier);
 
     pthread_barrier_init(&response_wait_barrier, NULL, 2);
 
     struct sockaddr_in server_address = {0};
     server_address.sin_family = AF_INET;
-    uint16_t server_port = strtol(argv[2], NULL, 10);
+    uint16_t server_port = strtol(argv[1], NULL, 10);
     server_address.sin_port = htons(server_port);
-    if (inet_pton(AF_INET, argv[1], &server_address.sin_addr) == -1) {
+    if (inet_pton(AF_INET, server_address_char, &server_address.sin_addr) == -1) {
         perror("Invalid IP address");
         return 1;
     }

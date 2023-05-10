@@ -13,6 +13,8 @@
 #include "cmd/invoker.h"
 #include "cmd/command.h"
 
+#include "discovery_server.h"
+
 #define MAX_CLIENTS 10
 
 int client_sockets[MAX_CLIENTS];
@@ -35,7 +37,6 @@ void *handle_server_msg(void *arg) {
     };
 
     while ((read_size = recv(client_socket, buffer, BUFFER_SIZE, 0)) > 0) {
-        printf("New MSG: %s", buffer);
         args.buffer = buffer;
         args.read_bytes = read_size;
         invoke(parse_request(buffer), &args);
@@ -76,6 +77,9 @@ int main(int argc, char *argv[]) {
     }
 
     printf(YELLOW("Server listening on port %d\n"), ntohs(server_address.sin_port));
+
+    pthread_t multicast_thread;
+    pthread_create(&multicast_thread, NULL, multicast_thread_handler, NULL);
 
     while (1) {
         int client_socket = accept(server_socket, NULL, NULL);

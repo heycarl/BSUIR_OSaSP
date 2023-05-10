@@ -53,11 +53,11 @@ add_executable(LAB_8_Server
         LAB_8/src/server/cmd/cmd.h
         LAB_8/src/server/cmd/ack.h
         LAB_8/src/server/cmd/parser.h
-        LAB_8/src/server/cmd/invoker.h LAB_8/src/server/cmd/echo.h LAB_8/src/server/cmd/fs.h LAB_8/src/server/cmd/info.h LAB_8/src/server/cmd/command.h LAB_8/src/server/cmd/quit.h LAB_8/src/protocol/protocol.h)
+        LAB_8/src/server/cmd/invoker.h LAB_8/src/server/cmd/echo.h LAB_8/src/server/cmd/fs.h LAB_8/src/server/cmd/info.h LAB_8/src/server/cmd/command.h LAB_8/src/server/cmd/quit.h LAB_8/src/protocol/protocol.h LAB_8/src/server/discovery_server.h)
 
 add_executable(LAB_8_Client
         LAB_8/src/client/main.c
-        LAB_8/src/protocol/protocol.h)
+        LAB_8/src/protocol/protocol.h LAB_8/src/client/discovery_client.h)
 
 target_include_directories(LAB_2 PRIVATE
         .)
