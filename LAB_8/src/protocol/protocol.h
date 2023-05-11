@@ -77,9 +77,9 @@ char* packet_type_ui(enum PACKET_TYPE type) {
         case PACKET_DIRECTORTY:
             return "DIR";
         case PACKET_DISCOVERY_REQ:
-            return "DISCOVERY REQUEST";
+            return "DISC_REQ";
         case PACKET_DISCOVERY_RESP:
-            return "DISCOVERY RESPONSE";
+            return "DISC_RESP";
         default:
             return "UNKNOWN";
     }

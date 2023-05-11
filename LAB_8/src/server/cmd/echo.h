@@ -12,7 +12,7 @@
 #include "command.h"
 
 void cmd_echo(args_t* args) {
-    char* r = args->buffer + strlen("CMD_ECHO ") * sizeof(char);
+    char* r = args->buffer + strlen("ECHO ") * sizeof(char);
     packet_t response;
     response.type = PACKET_INFO;
     set_payload_string(&response, r);

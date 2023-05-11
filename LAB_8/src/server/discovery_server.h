@@ -67,8 +67,7 @@ void *multicast_thread_handler(void *arg) {
 
         packet_t* packet = deserialize_packet(buffer);
         inet_ntop(AF_INET, &src_addr.sin_addr, src_ip_char, INET_ADDRSTRLEN);
-
-        printf(YELLOW("Multicast packet recived [%s] : ") "%s\n", packet_type_ui(packet->type), packet->payload.data);
+        printf(YELLOW("Multicast packet recived ") CYAN("[%s]") YELLOW(" : ") "%s\n", packet_type_ui(packet->type), packet->payload.data);
         if (packet->type == PACKET_DISCOVERY_REQ) {
             packet_t server_discovery_resp;
             server_discovery_resp.type = PACKET_DISCOVERY_RESP;

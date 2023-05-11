@@ -87,7 +87,7 @@ void *multicast_thread_handler(void *arg) {
     char buffer[BUFFER_SIZE];
     while ((recvfrom(sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*) &src_addr, &addrlen)) > 0) {
         packet_t* packet = deserialize_packet(buffer);
-        printf(YELLOW("Multicast packet recived [%s] : ") "%s\n", packet_type_ui(packet->type), packet->payload.data);
+        printf(YELLOW("Multicast packet recived ") CYAN("[%s]") YELLOW(" : ") "%s\n", packet_type_ui(packet->type), packet->payload.data);
         if (packet->type == PACKET_DISCOVERY_RESP) {
             strcpy(server_address_char, packet->payload.data);
             break;
