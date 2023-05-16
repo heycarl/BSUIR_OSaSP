@@ -1,67 +1,67 @@
 //
 // Created by sasha on 4/25/23.
 //
-
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <time.h>
 
+#define INDEX_RECORD_SIZE 16
+#define HEADER_SIZE 8
+
 struct index_s {
-    double time_mark; // timestamp
-    uint64_t recno;   // record INDEX
+    double time_mark;
+    uint64_t recno;
 };
 
 struct index_hdr_s {
-    uint64_t records;     // records num in DB
-    struct index_s idx[]; // records array
+    uint64_t records;
+    struct index_s idx[];
 };
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     if (argc != 3) {
-        fprintf(stderr, "Usage: %s <filename> <index_size>\n", argv[0]);
+        printf("Usage: %s filename size_in_MB\n", argv[0]);
         return 1;
     }
 
-    char* filename = argv[1];
-//    uint64_t records = atoi(argv[2]);
-    char **end = NULL;
-    uint64_t records = strtol(argv[2], end, 10);
 
-    if (records % 256 != 0) {
-        fprintf(stderr,"Index %% 256 should be 0\n");
-        return 1;
-    }
+    char *filename = argv[1];
+    int size = atoi(argv[2]);
+    int num_records = (size * 1024 * 1024) / INDEX_RECORD_SIZE;
+    int header_size = HEADER_SIZE + num_records * INDEX_RECORD_SIZE;
 
-    struct index_hdr_s* header = (struct index_hdr_s*)malloc(sizeof(struct index_hdr_s) + records * sizeof(struct index_s));
+
+    struct index_hdr_s *header = (struct index_hdr_s *) malloc(header_size);
     if (header == NULL) {
-        fprintf(stderr,"Memory allocation error\n");
+        printf("Memory allocation failed\n");
         return 1;
     }
 
-    header->records = records;
+    header->records = num_records;
 
-    srand(time(0));
+    srand(time(NULL));
+    for (int i = 0; i < num_records; i++) {
+        struct index_s *record = &(header->idx[i]);
 
-    for (uint64_t i = 0; i < records; i++) {
-        double time_mark = 15020.0 + (rand() / (double)RAND_MAX) * (365.0 - 0.5);
-        uint64_t recno = 1 + rand() % (UINT64_MAX - 1);
-        header->idx[i].time_mark = time_mark;
-        header->idx[i].recno = recno;
+        double days_since_1900 = (double) (rand() % (365 * 123)) + 15020.0;
+        double fraction_of_day = (double) rand() / RAND_MAX / 2.0;
+        record->time_mark = days_since_1900 + fraction_of_day;
+
+        record->recno = i;
     }
 
-    FILE* file = fopen(filename, "wb");
-    if (file == NULL) {
-        fprintf(stderr, "File opening error\n");
-        free(header);
+
+    FILE *fp = fopen(filename, "wb");
+    if (fp == NULL) {
+        printf("Failed to open file %s\n", filename);
         return 1;
     }
 
-    fwrite(header, sizeof(struct index_hdr_s) + records * sizeof(struct index_s), 1, file);
-    fclose(file);
+    fwrite(header, header_size, 1, fp);
+    fclose(fp);
 
-    free(header);
-    fprintf(stdout, "File generated: %s\n", filename);
+    printf("Generated %d index records in file %s\n", num_records, filename);
 
     return 0;
 }

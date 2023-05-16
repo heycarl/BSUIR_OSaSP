@@ -45,8 +45,8 @@ add_executable(LAB_6_Generator
         LAB_6/src/generator/main.c)
 
 add_executable(LAB_6_Sort
-        LAB_6/src/sort_index/main.c
-        )
+        LAB_6/src/sort_index/sort_index.c
+        LAB_6/src/sort_index/sort_index.h LAB_6/src/sort_index/thread.c LAB_6/src/sort_index/thread.h LAB_6/src/sort_index/utils.h)
 
 add_executable(LAB_8_Server
         LAB_8/src/server/main.c
