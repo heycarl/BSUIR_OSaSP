@@ -28,31 +28,59 @@ struct record_s {
     char address[80];
     uint8_t semester;
 };
-
-// set write lock, otherwise set lock.l_type in F_UNLCK
-bool get_lock(int fd, int offset, short whence, short type) {
+/**
+ * Get lock state
+ * @param fd File Descriptor
+ * @param offset Memory offset
+ * @param size Lock size
+ * @return Is data locked
+ */
+bool get_lock_state(int fd, off_t offset, off_t size) {
     struct flock lock;
-    lock.l_type = type; // F_WRLCK
+    lock.l_type = F_WRLCK;  // Check for a Write lock
+    lock.l_whence = SEEK_SET;
     lock.l_start = offset;
-    lock.l_whence = whence;
-    lock.l_len = RECORD_SIZE;
-    if (fcntl(fd, F_GETLK, &lock) == -1) {
-        perror("fcntl");
-        exit(1);
-    }
-    return lock.l_type != F_UNLCK;
-}
+    lock.l_len = size;
 
-void unlock_record(int fd, int offset, short whence) {
+    if (fcntl(fd, F_GETLK, &lock) == -1) {
+        perror("Failed to get lock information");
+        return false;
+    }
+
+    return lock.l_type == F_WRLCK;
+}
+/**
+ * Lock
+ * @param fd File Descriptor
+ * @param offset Memory offset
+ * @param size Lock size
+ * @param lock_type Lock type
+ * @return Lock result
+ */
+int lock(int fd, off_t offset, off_t size, short lock_type) {
+    struct flock lock;
+    lock.l_type = lock_type;
+    lock.l_whence = SEEK_SET;
+    lock.l_start = offset;
+    lock.l_len = size;
+
+    return fcntl(fd, F_SETLK, &lock);
+}
+/**
+ * Unlock
+ * @param fd File Descriptor
+ * @param offset Memory offset
+ * @param size Unlock size
+ * @return Unlock result code
+ */
+int unlock(int fd, off_t offset, off_t size) {
     struct flock lock;
     lock.l_type = F_UNLCK;
+    lock.l_whence = SEEK_SET;
     lock.l_start = offset;
-    lock.l_whence = whence;
-    lock.l_len = RECORD_SIZE;
-    if (fcntl(fd, F_SETLK, &lock) == -1) {
-        perror("fcntl");
-        exit(1);
-    }
+    lock.l_len = size;
+
+    return fcntl(fd, F_SETLK, &lock);
 }
 
 int get_record(int fd, int record_num, struct record_s *record) {
@@ -80,7 +108,7 @@ void put_record(int fd, int record_num, struct record_s *record) {
         perror("lseek");
         return;
     }
-//    sleep(10);
+    sleep(10);
     if(write(fd, record, sizeof(struct record_s)) == -1){
         perror("write");
         return;
@@ -146,13 +174,14 @@ int main(void) {
             }
             if (record_num == -1) {
                 printf(RED("No free records\n"));
-            } else if (get_lock(fd, record_num * RECORD_SIZE, SEEK_SET, F_WRLCK)) {
+            } else if (get_lock_state(fd, record_num * RECORD_SIZE, RECORD_SIZE)) {
                 printf(RED("Record is locked\n"));
             } else {
+                lock(fd, record_num * RECORD_SIZE, RECORD_SIZE, F_WRLCK);
                 memset(&record, 0, sizeof(struct record_s));
                 modify_record(&record);
                 put_record(fd, record_num, &record);
-                unlock_record(fd, record_num * RECORD_SIZE, SEEK_SET);
+                unlock(fd,record_num * RECORD_SIZE, RECORD_SIZE);
                 printf(CYAN("Record added at position %d\n"), record_num);
             }
         } else if (strncmp(input, "MOD", 3) == 0) {
@@ -164,22 +193,22 @@ int main(void) {
                 record_sav = record;
                 modify_record(&record);
                 if(!cmp_record(record, record_sav)){
-                    if (get_lock(fd, record_num * RECORD_SIZE, SEEK_SET, F_WRLCK)) {
+                    if (get_lock_state(fd, record_num * RECORD_SIZE, RECORD_SIZE)) {
                         printf(RED("Record is locked\n"));
                     } else {
+                        lock(fd, record_num * RECORD_SIZE, RECORD_SIZE, F_WRLCK);
                         struct record_s record_new;
                         get_record(fd, record_num, &record_new);
                         if(cmp_record(record_sav, record_new)){
                             // одинаковые (никто не изменил пока мы думали)
                             // put_record(fd, record_num, &record);
-                            unlock_record(fd, record_num * RECORD_SIZE, SEEK_SET);
+                            unlock(fd,record_num * RECORD_SIZE, RECORD_SIZE);
                             printf(CYAN("Record modified at position %d\n"), record_num);
-                        }
-                        else{
+                        } else {
                             // кто-то изменил запись после получения ее нами
                             // повторяем с ее новым содержимым
                             printf(CYAN("Data has been updated, please try again!\n"));
-                            unlock_record(fd, record_num * RECORD_SIZE, SEEK_SET);
+                            unlock(fd,record_num * RECORD_SIZE, RECORD_SIZE);
                             record = record_new;
                             goto AGAIN;
                         }
@@ -193,11 +222,12 @@ int main(void) {
         } else if (strcmp(input, "PUT") == 0) {
             if (record_num == -1) {
                 printf("No record to save\n");
-            } else if (get_lock(fd, record_num * RECORD_SIZE, SEEK_SET, F_WRLCK)) {
-                printf("Record is locked\n");
+            } else if (get_lock_state(fd, record_num * RECORD_SIZE, RECORD_SIZE)) {
+                printf(RED("Record is locked\n"));
             } else {
+                lock(fd, record_num * RECORD_SIZE, RECORD_SIZE, F_WRLCK);
                 put_record(fd, record_num, &record);
-                unlock_record(fd, record_num * RECORD_SIZE, SEEK_SET);
+                unlock(fd,record_num * RECORD_SIZE, RECORD_SIZE);
                 printf("Record #%d saved\n", record_num);
             }
         } else if (strcmp(input, "QUIT") == 0) {
