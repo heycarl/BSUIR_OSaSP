@@ -9,6 +9,8 @@
 #include <semaphore.h>
 #include <unistd.h>
 
+#include "color_print.h"
+
 extern msg_queue* queue;
 extern sem_t    * mutex;
 
@@ -20,7 +22,7 @@ extern size_t consumers_amount;
 
 void create_consumer(void) {
   if (consumers_amount == CHILD_MAX - 1) {
-    fputs("Max value of consumers\n", stderr);
+    fputs(RED("Max value of consumers\n"), stderr);
     return;
   }
 
@@ -61,7 +63,7 @@ void create_consumer(void) {
 
 void remove_consumer(void) {
   if (consumers_amount == 0) {
-    fputs("No consumers to delete\n", stderr);
+    fputs(RED("No consumers to delete\n"), stderr);
     return;
   }
 
@@ -75,7 +77,7 @@ void consume_msg(msg_t* msg) {
   msg->hash = 0;
   uint16_t check_sum = hash(msg);
   if (msg_hash != check_sum) {
-    fprintf(stderr, "check_sum=%X not equal msg_hash=%X\n",
+    fprintf(stderr, RED("check_sum=%X not equal msg_hash=%X\n"),
             check_sum, msg_hash);
   }
   msg->hash = msg_hash;

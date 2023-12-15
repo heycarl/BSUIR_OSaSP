@@ -44,9 +44,19 @@ add_executable(LAB_5
 add_executable(LAB_6_Generator
         LAB_6/src/generator/main.c)
 
+add_executable(LAB_6_Printer
+        LAB_6/src/printer/main.c)
+
+
 add_executable(LAB_6_Sort
         LAB_6/src/sort_index/sort_index.c
         LAB_6/src/sort_index/sort_index.h LAB_6/src/sort_index/thread.c LAB_6/src/sort_index/thread.h LAB_6/src/sort_index/utils.h)
+
+add_executable(LAB_7_P1 LAB_7/p1/src/main.c LAB_7/p1/src/message/message.h LAB_7/p1/src/message/message.c LAB_7/p1/src/consumer/consumer.c LAB_7/p1/src/consumer/consumer.h LAB_7/p1/src/producer/producer.c LAB_7/p1/src/producer/producer.h)
+
+add_executable(LAB_7_P2 LAB_7/p2/src/main.c)
+
+add_executable(LAB_7_P2_2 LAB_7/p2/src/main.c)
 
 add_executable(LAB_8_Server
         LAB_8/src/server/main.c
@@ -83,7 +93,20 @@ target_include_directories(LAB_5 PRIVATE
 target_include_directories(LAB_6_Generator PRIVATE
         .)
 
+target_include_directories(LAB_6_Printer PRIVATE
+        .)
+
 target_include_directories(LAB_6_Sort PRIVATE
+        .)
+
+target_include_directories(LAB_7_P1 PRIVATE
+        .)
+
+target_include_directories(LAB_7_P2 PRIVATE
+        .)
+
+
+target_include_directories(LAB_7_P2_2 PRIVATE
         .)
 
 target_include_directories(LAB_8_Server PRIVATE

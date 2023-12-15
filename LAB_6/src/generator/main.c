@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
+#include <color_print.h>
 
 #define INDEX_RECORD_SIZE 16
 #define HEADER_SIZE 8
@@ -30,7 +31,6 @@ int main(int argc, char *argv[]) {
     int size = atoi(argv[2]);
     int num_records = (size * 1024 * 1024) / INDEX_RECORD_SIZE;
     int header_size = HEADER_SIZE + num_records * INDEX_RECORD_SIZE;
-
 
     struct index_hdr_s *header = (struct index_hdr_s *) malloc(header_size);
     if (header == NULL) {
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     fwrite(header, header_size, 1, fp);
     fclose(fp);
 
-    printf("Generated %d index records in file %s\n", num_records, filename);
+    printf(CYAN("[INFO]")" Generated "YELLOW("%d") " index records in file "YELLOW("%s")"\n", num_records, filename);
 
     return 0;
 }

@@ -96,7 +96,7 @@ void merge(long memsize, long blocks, long no) {
     while (j < n) {
         indices -> idx[k++] = idx2[j++];
     }
-    printf(YELLOW("merged block %ld") " and block:%ld at %ld and %ld, sizes: 1(%ld) | s(%ld)\n", no, no + 1, (memsize / blocks) * (no), (memsize / blocks) * (no + 1), (memsize / blocks), (memsize / blocks));
+    printf(YELLOW("merged block ") CYAN("%ld") " and block:" CYAN("%ld") "at addr %ld and %ld, sizes: (%ld) | (%ld)\n", no, no + 1, (memsize / blocks) * (no), (memsize / blocks) * (no + 1), (memsize / blocks), (memsize / blocks));
 }
 
 void mergePhase(args* arguments) {
@@ -128,7 +128,7 @@ void mergePhase(args* arguments) {
 
 void sortPhase(args* arguments) {
     map[arguments -> no].isBusy = 1;
-    printf("#%zu offset: %zu block N: %ld\n", arguments -> no, (arguments -> memsize / arguments -> blocks) * arguments -> no, arguments -> memsize / arguments -> blocks);
+    printf(YELLOW("#%zu")" offset: %zu block N: %ld\n", arguments -> no, (arguments -> memsize / arguments -> blocks) * arguments -> no, arguments -> memsize / arguments -> blocks);
     qsort(indices -> idx + ((arguments -> memsize / arguments -> blocks) * arguments -> no), arguments -> memsize / arguments -> blocks, sizeof(index_s), compare);
     for (size_t i = arguments -> no; i < (size_t) arguments -> blocks; i++) {
         if (map[i].isBusy != 1) {
@@ -157,7 +157,7 @@ static void* execute(args* arguments) {
         printf(YELLOW("thread: %lu") ": merge\n", arguments->no);
         mergePhase(arguments);
         pthread_barrier_wait(&barrier);
-        printf(YELLOW("thread: %lu") ": left: %lu\n", arguments->no, FILESIZE - curSize);
+        printf(YELLOW("thread: %lu") ": left in file: %lu\n", arguments->no, FILESIZE - curSize);
     }
     pthread_barrier_wait(&barrier);
     printf(YELLOW("thread: %lu") ": complete...\n", arguments -> no);
@@ -205,7 +205,7 @@ void createThreads(long amount, long memsize, long blocks, char* path, char* fil
         sortPhase(arguments);
         pthread_mutex_init(&merge_mutex, NULL);
         pthread_barrier_wait(&barrier);
-        printf("THREAD_%lu: START MERGING\n", arguments->no);
+        printf(YELLOW("THREAD_%lu")": START MERGING\n", arguments->no);
         mergePhase(arguments);
         merge(memsize, 2, 0);
         curSize += memsize;
